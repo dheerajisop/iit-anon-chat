@@ -57,7 +57,7 @@
         /* --- MOBILE TWEAKS --- */
         @media (max-width: 1000px) {
             #left-decor, #right-decor { display: none; }
-            /* Use 100dvh for dynamic height (fixes some keyboard issues) */
+            /* Use 100dvh to handle mobile browser bars better */
             #chat-container { height: 100dvh; border-radius: 0; max-width: 100%; }
         }
 
@@ -72,7 +72,7 @@
             flex-direction: column;
             gap: 8px;
             background-color: #fff;
-            scroll-behavior: smooth; /* Smooth scrolling */
+            scroll-behavior: smooth; 
         }
 
         .msg { 
@@ -94,7 +94,7 @@
             display: none; 
             gap: 10px;
             border-top: 1px solid #eee;
-            /* Ensure controls don't get hidden by iOS keyboard */
+            /* Safe area padding for iPhones */
             padding-bottom: max(15px, env(safe-area-inset-bottom));
         }
 
@@ -155,22 +155,34 @@
         const skipBtn = document.getElementById("skipBtn");
         const bigCount = document.getElementById("big-count");
 
-        // --- SCROLL HELPER (The Fix) ---
+        // --- 1. ALWAYS SCROLL (For New Messages) ---
         function scrollToBottom() {
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // 1. When keyboard opens (focus), wait 300ms then scroll
-        msgInput.addEventListener('focus', () => {
-            setTimeout(scrollToBottom, 300);
-        });
+        // --- 2. CONDITIONAL SCROLL (For Keyboard) ---
+        function adjustForKeyboard() {
+            // Get total height of messages
+            const contentHeight = chatBox.scrollHeight;
+            // Get visible height of the box
+            const visibleHeight = chatBox.clientHeight;
 
-        // 2. When screen resizes (e.g. keyboard fully up), scroll
+            // YOUR LOGIC: If messages take up less than 50% of space, DON'T scroll.
+            // If they take up more than 50%, scroll to keep bottom visible.
+            if (contentHeight > (visibleHeight * 0.5)) {
+                setTimeout(scrollToBottom, 300);
+            }
+        }
+
+        // Attach the conditional logic to Focus
+        msgInput.addEventListener('focus', adjustForKeyboard);
+
+        // Also check on resize (optional, but good for rotation)
         window.addEventListener('resize', () => {
-            if(currentRoom) scrollToBottom();
+            if(currentRoom) adjustForKeyboard();
         });
 
-        // --- NORMAL LOGIC ---
+        // --- CORE LOGIC ---
         startBtn.addEventListener("click", startSearch);
         skipBtn.addEventListener("click", () => {
             if(currentRoom) {
@@ -204,7 +216,8 @@
             msgInput.disabled = false;
             sendBtn.disabled = false;
             msgInput.focus();
-            setTimeout(scrollToBottom, 100); // Scroll on start
+            // We use standard scroll here because a new chat usually starts empty/short
+            scrollToBottom(); 
         });
 
         socket.on('message', (msg) => {
@@ -238,7 +251,8 @@
             div.innerText = msg;
             div.classList.add('msg', type);
             chatBox.appendChild(div);
-            scrollToBottom(); // Scroll on new message
+            // Always scroll on new message (unconditional)
+            scrollToBottom(); 
         }
 
         function addSystemMessage(msg) {

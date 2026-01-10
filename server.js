@@ -13,6 +13,8 @@ let waitingUser = null;
 
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
+    let usercount = io.engine.clientsCount;
+        io.emit('user-count', usercount);
 
     socket.on('join-chat', () => {
         if (waitingUser === null) {
@@ -55,6 +57,9 @@ io.on('connection', (socket) => {
             // Send "stranger-disconnected" event to the room
             socket.to(socket.currentRoom).emit('stranger-disconnected');
         }
+
+        let usercount = io.engine.clientsCount;
+        io.emit('user-count', usercount);
     });
 });
 

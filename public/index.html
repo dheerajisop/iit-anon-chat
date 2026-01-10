@@ -19,6 +19,7 @@
 <body>
 
     <h1>IIT Bhubaneswar Anonymous Chat</h1>
+    <p>Users Online: <span id="user-count">0</span></p>
     <p id="status">Click "Find Stranger" to start</p>
     <button id="findBtn">Find Stranger</button>
 
@@ -41,6 +42,10 @@
         const controls = document.getElementById("controls");
         const msgInput = document.getElementById("msgInput");
         const sendBtn = document.getElementById("sendBtn");
+        // Listen for the count update
+        socket.on('user-count', (count) => {
+            document.getElementById("user-count").innerText = count;
+        });
 
         // --- CORE LOGIC ---
 

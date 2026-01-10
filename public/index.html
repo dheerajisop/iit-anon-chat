@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IIT Anon Chat</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin-top: 50px; }
+        #chat-box { width: 400px; height: 300px; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; display: none; }
+        .msg { padding: 5px; margin: 2px; border-radius: 5px; }
+        .my-msg { background: #dcf8c6; text-align: right; }
+        .stranger-msg { background: #f1f0f0; }
+        #controls { margin-top: 10px; display: none; width: 400px; }
+        input { width: 75%; padding: 10px; }
+        button { padding: 10px; cursor: pointer; }
+        #status { font-weight: bold; margin-bottom: 10px; color: #555; }
+    </style>
+</head>
+<body>
+
+    <h1>IIT Bhubaneswar Anonymous Chat</h1>
+    <p id="status">Click "Find Stranger" to start</p>
+    <button id="findBtn">Find Stranger</button>
+
+    <div id="chat-box"></div>
+
+    <div id="controls">
+        <input type="text" id="msgInput" placeholder="Type a message...">
+        <button id="sendBtn">Send</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        
+        let currentRoom = null; 
+
+        const statusText = document.getElementById("status");
+        const findBtn = document.getElementById("findBtn");
+        const chatBox = document.getElementById("chat-box");
+        const controls = document.getElementById("controls");
+        const msgInput = document.getElementById("msgInput");
+        const sendBtn = document.getElementById("sendBtn");
+
+        // --- CORE LOGIC ---
+
+        // 1. Click "Find Stranger"
+        findBtn.addEventListener("click", () => {
+            socket.emit('join-chat'); 
+            findBtn.style.display = "none";
+            
+            // Reset UI for new chat
+            statusText.innerText = "Searching for a stranger...";
+            statusText.style.color = "black";
+            chatBox.innerHTML = ""; // Clear old messages
+            msgInput.disabled = false;
+            sendBtn.disabled = false;
+        });
+
+        // 2. Chat Started! (Server found a match)
+        socket.on('start-chat', (roomID) => {
+            currentRoom = roomID;
+            chatBox.style.display = "block";
+            controls.style.display = "flex";
+            statusText.innerText = "Stranger found! Say Hello.";
+        });
+
+        // 3. Receive Message
+        socket.on('message', (msg) => {
+            addMessage(msg, 'stranger-msg');
+        });
+
+        // 4. Stranger Disconnected (The "Zombie" Fix)
+        socket.on('stranger-disconnected', () => {
+            statusText.innerText = "Stranger disconnected.";
+            statusText.style.color = "red";
+            
+            // Lock the chat so you can't type
+            msgInput.disabled = true;
+            sendBtn.disabled = true;
+
+            // Show button to find a NEW partner
+            findBtn.style.display = "block";
+            findBtn.innerText = "Find New Partner";
+        });
+
+        // 5. Send Message Logic
+        sendBtn.addEventListener("click", sendMessage);
+        
+        // Also send if user presses "Enter" key
+        msgInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") sendMessage();
+        });
+
+        function sendMessage() {
+            const msg = msgInput.value;
+            if(!msg) return;
+
+            addMessage(msg, 'my-msg');
+            socket.emit('user-message', { message: msg, room: currentRoom });
+            msgInput.value = "";
+        }
+
+        // UI Helper: Adds div to screen
+        function addMessage(msg, type) {
+            const div = document.createElement('div');
+            div.innerText = msg;
+            div.classList.add('msg', type);
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight; 
+        }
+
+        // Simple status update listener
+        socket.on('status', (msg) => {
+            // Only update status if we aren't already in a "disconnected" state
+            if (statusText.innerText !== "Stranger disconnected.") {
+                statusText.innerText = msg;
+            }
+        });
+
+    </script>
+</body>
+</html>

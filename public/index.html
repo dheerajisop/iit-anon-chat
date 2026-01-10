@@ -16,13 +16,13 @@
             margin: 0; 
             background-color: #f4f4f9;
             height: 100vh; 
-            overflow: hidden; /* Prevent scrolling the background */
+            overflow: hidden; 
         }
 
-        /* --- THE CHAT CONTAINER (Center) --- */
+        /* --- THE CHAT CONTAINER --- */
         #chat-container {
             width: 100%;
-            max-width: 420px; /* Kept it slim */
+            max-width: 420px; 
             height: 90vh;
             background: white;
             border-radius: 20px;
@@ -30,75 +30,49 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            z-index: 10; /* Keeps chat ON TOP of the background text */
+            z-index: 10; 
             position: relative;
         }
 
-        /* --- 1. LEFT SIDE BRANDING (Desktop Only) --- */
+        /* --- BRANDING (Desktop) --- */
         #left-decor {
-            position: fixed;
-            left: 5%;
-            top: 50%;
-            transform: translateY(-50%);
-            text-align: center;
-            z-index: 1;
+            position: fixed; left: 5%; top: 50%; transform: translateY(-50%);
+            text-align: center; z-index: 1;
         }
-
         .gradient-text {
-            font-size: 12vw; /* Massive size based on screen width */
-            font-weight: 900;
-            line-height: 0.9;
-            background: linear-gradient(45deg, #ff00cc, #333399); /* Gradient Color */
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-family: 'Arial Black', sans-serif;
-            opacity: 0.8;
+            font-size: 12vw; font-weight: 900; line-height: 0.9;
+            background: linear-gradient(45deg, #ff00cc, #333399);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-family: 'Arial Black', sans-serif; opacity: 0.8;
         }
 
-        /* --- 2. RIGHT SIDE STATS (Desktop Only) --- */
+        /* --- STATS (Desktop) --- */
         #right-decor {
-            position: fixed;
-            right: 10%;
-            top: 50%;
-            transform: translateY(-50%);
-            text-align: center;
-            z-index: 1;
-            color: #333;
+            position: fixed; right: 10%; top: 50%; transform: translateY(-50%);
+            text-align: center; z-index: 1; color: #333;
         }
+        #big-count { font-size: 15vw; font-weight: bold; color: #4CAF50; line-height: 1; }
+        #big-label { font-size: 2vw; text-transform: uppercase; letter-spacing: 5px; color: #555; font-weight: bold; }
 
-        #big-count {
-            font-size: 15vw; /* Massive Number */
-            font-weight: bold;
-            color: #4CAF50;
-            line-height: 1;
-        }
-        #big-label {
-            font-size: 2vw;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            color: #555;
-            font-weight: bold;
-        }
-
-        /* --- MOBILE HIDER --- */
-        /* If screen is smaller than 1000px (Tablets/Phones), hide the side texts */
+        /* --- MOBILE TWEAKS --- */
         @media (max-width: 1000px) {
             #left-decor, #right-decor { display: none; }
-            #chat-container { height: 100vh; border-radius: 0; max-width: 100%; }
+            /* Use 100dvh for dynamic height (fixes some keyboard issues) */
+            #chat-container { height: 100dvh; border-radius: 0; max-width: 100%; }
         }
 
-        /* --- CHAT UI (Clean Version) --- */
+        /* --- CHAT UI --- */
         h1 { font-size: 1.2rem; text-align: center; margin: 15px 0; color: #333; }
 
         #chat-box { 
             flex-grow: 1; 
             overflow-y: auto; 
             padding: 15px; 
-            display: flex; /* Hidden by default in logic, but flex when active */
+            display: none; 
             flex-direction: column;
             gap: 8px;
             background-color: #fff;
-            display: none; /* Hidden initially */
+            scroll-behavior: smooth; /* Smooth scrolling */
         }
 
         .msg { 
@@ -114,61 +88,34 @@
         .stranger-msg { background: #f0f0f0; color: black; align-self: flex-start; border-bottom-left-radius: 4px; }
         .system-msg { align-self: center; color: #888; font-size: 0.8em; margin: 10px 0; }
 
-        /* CONTROLS */
         #controls { 
             padding: 15px;
             background: #f9f9f9;
             display: none; 
             gap: 10px;
             border-top: 1px solid #eee;
+            /* Ensure controls don't get hidden by iOS keyboard */
+            padding-bottom: max(15px, env(safe-area-inset-bottom));
         }
 
-        input { 
-            flex-grow: 1; padding: 12px; border: 1px solid #ddd; 
-            border-radius: 20px; font-size: 16px; outline: none; 
-        }
-
+        input { flex-grow: 1; padding: 12px; border: 1px solid #ddd; border-radius: 20px; font-size: 16px; outline: none; }
         button { cursor: pointer; border: none; font-weight: bold; }
+        #sendBtn { background-color: #007AFF; color: white; padding: 0 20px; border-radius: 20px; }
+        #skipBtn { padding: 10px 20px; background: #ff3b30; color: white; border-radius: 20px; font-size: 14px; }
 
-        #sendBtn { 
-            background-color: #007AFF; color: white; 
-            padding: 0 20px; border-radius: 20px; 
-        }
-
-        /* START SCREEN */
         #start-screen {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
+            flex-grow: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; padding: 20px; text-align: center;
         }
-
         #startBtn {
-            padding: 15px 50px; font-size: 18px;
-            background: #4CAF50; color: white;
-            border-radius: 30px; margin-top: 20px;
-            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
-            transition: transform 0.1s;
+            padding: 15px 50px; font-size: 18px; background: #4CAF50; color: white;
+            border-radius: 30px; margin-top: 20px; box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
         }
-        #startBtn:active { transform: scale(0.95); }
-
-        #skipBtn {
-            padding: 10px 20px;
-            background: #ff3b30; color: white;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-
     </style>
 </head>
 <body>
 
-    <div id="left-decor">
-        <div class="gradient-text">IIT<br>BBS</div>
-    </div>
+    <div id="left-decor"><div class="gradient-text">IIT<br>BBS</div></div>
 
     <div id="chat-container">
         <h1>Anonymous Chat</h1>
@@ -198,7 +145,6 @@
         const socket = io();
         let currentRoom = null; 
 
-        // UI Elements
         const startScreen = document.getElementById("start-screen");
         const startBtn = document.getElementById("startBtn");
         const statusText = document.getElementById("status-text");
@@ -207,12 +153,25 @@
         const msgInput = document.getElementById("msgInput");
         const sendBtn = document.getElementById("sendBtn");
         const skipBtn = document.getElementById("skipBtn");
-        const bigCount = document.getElementById("big-count"); // The Big Number on Right
+        const bigCount = document.getElementById("big-count");
 
-        // --- 1. START ---
+        // --- SCROLL HELPER (The Fix) ---
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // 1. When keyboard opens (focus), wait 300ms then scroll
+        msgInput.addEventListener('focus', () => {
+            setTimeout(scrollToBottom, 300);
+        });
+
+        // 2. When screen resizes (e.g. keyboard fully up), scroll
+        window.addEventListener('resize', () => {
+            if(currentRoom) scrollToBottom();
+        });
+
+        // --- NORMAL LOGIC ---
         startBtn.addEventListener("click", startSearch);
-
-        // --- 2. SKIP ---
         skipBtn.addEventListener("click", () => {
             if(currentRoom) {
                 socket.emit('leave-chat');
@@ -226,34 +185,26 @@
             chatBox.innerHTML = ""; 
             msgInput.disabled = true;
             sendBtn.disabled = true;
-            
-            // Switch Screens
             startScreen.style.display = "flex"; 
             chatBox.style.display = "none";
             controls.style.display = "none";
-            
             startBtn.style.display = "none";    
             statusText.innerText = "Searching...";
-            
             socket.emit('join-chat');
         }
 
-        // --- SOCKET EVENTS ---
-        socket.on('user-count', (count) => {
-            bigCount.innerText = count; // Update the HUGE number on the right
-        });
+        socket.on('user-count', (count) => bigCount.innerText = count);
 
         socket.on('start-chat', (roomID) => {
             currentRoom = roomID;
-            
             startScreen.style.display = "none"; 
             chatBox.style.display = "flex";
             controls.style.display = "flex"; 
-            
             addSystemMessage("Connected! Say Hi.");
             msgInput.disabled = false;
             sendBtn.disabled = false;
             msgInput.focus();
+            setTimeout(scrollToBottom, 100); // Scroll on start
         });
 
         socket.on('message', (msg) => {
@@ -268,7 +219,6 @@
             skipBtn.style.backgroundColor = "#4CAF50"; 
         });
 
-        // --- SEND LOGIC ---
         sendBtn.addEventListener("click", sendMessage);
         msgInput.addEventListener("keypress", (e) => {
             if (e.key === "Enter") sendMessage();
@@ -288,7 +238,7 @@
             div.innerText = msg;
             div.classList.add('msg', type);
             chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight; 
+            scrollToBottom(); // Scroll on new message
         }
 
         function addSystemMessage(msg) {
@@ -296,7 +246,7 @@
             div.innerText = msg;
             div.classList.add('msg', 'system-msg');
             chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight; 
+            scrollToBottom(); 
         }
     </script>
 </body>

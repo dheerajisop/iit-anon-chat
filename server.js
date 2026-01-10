@@ -44,6 +44,35 @@ io.on('connection', (socket) => {
     socket.on('user-message', ({ message, room }) => {
         socket.to(room).emit('message', message);
     });
+    // ... inside io.on('connection', socket) ...
+
+    socket.on('typing', (room) => {
+        socket.to(room).emit('typing');
+    });
+
+    socket.on('stop-typing', (room) => {
+        socket.to(room).emit('stop-typing');
+    });
+    // --- NEW: Handle "Skip" Button ---
+    socket.on('leave-chat', () => {
+        if (socket.currentRoom) {
+            console.log("User skipped chat:", socket.id);
+            
+            // 1. Tell the partner "Stranger disconnected"
+            socket.to(socket.currentRoom).emit('stranger-disconnected');
+            
+            // 2. Make THIS user leave the room properly
+            socket.leave(socket.currentRoom);
+            
+            // 3. Clear the room tag so they are "free"
+            socket.currentRoom = null;
+        }
+        
+        // Also remove them from waiting queue if they clicked skip while searching
+        if (waitingUser === socket) {
+            waitingUser = null;
+        }
+    });
 
     // --- NEW: HANDLE DISCONNECT ---
     socket.on('disconnect', () => {

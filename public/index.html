@@ -2,111 +2,287 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IIT Anon Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IIT BBS Chat</title>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin-top: 50px; }
-        #chat-box { width: 400px; height: 300px; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; display: none; }
-        .msg { padding: 5px; margin: 2px; border-radius: 5px; }
-        .my-msg { background: #dcf8c6; text-align: right; }
-        .stranger-msg { background: #f1f0f0; }
-        #controls { margin-top: 10px; display: none; width: 400px; }
-        input { width: 75%; padding: 10px; }
-        button { padding: 10px; cursor: pointer; }
-        #status { font-weight: bold; margin-bottom: 10px; color: #555; }
+        * { box-sizing: border-box; }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            margin: 0; 
+            background-color: #f4f4f9;
+            height: 100vh; 
+            overflow: hidden; /* Prevent scrolling the background */
+        }
+
+        /* --- THE CHAT CONTAINER (Center) --- */
+        #chat-container {
+            width: 100%;
+            max-width: 420px; /* Kept it slim */
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 10; /* Keeps chat ON TOP of the background text */
+            position: relative;
+        }
+
+        /* --- 1. LEFT SIDE BRANDING (Desktop Only) --- */
+        #left-decor {
+            position: fixed;
+            left: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: center;
+            z-index: 1;
+        }
+
+        .gradient-text {
+            font-size: 12vw; /* Massive size based on screen width */
+            font-weight: 900;
+            line-height: 0.9;
+            background: linear-gradient(45deg, #ff00cc, #333399); /* Gradient Color */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'Arial Black', sans-serif;
+            opacity: 0.8;
+        }
+
+        /* --- 2. RIGHT SIDE STATS (Desktop Only) --- */
+        #right-decor {
+            position: fixed;
+            right: 10%;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: center;
+            z-index: 1;
+            color: #333;
+        }
+
+        #big-count {
+            font-size: 15vw; /* Massive Number */
+            font-weight: bold;
+            color: #4CAF50;
+            line-height: 1;
+        }
+        #big-label {
+            font-size: 2vw;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        /* --- MOBILE HIDER --- */
+        /* If screen is smaller than 1000px (Tablets/Phones), hide the side texts */
+        @media (max-width: 1000px) {
+            #left-decor, #right-decor { display: none; }
+            #chat-container { height: 100vh; border-radius: 0; max-width: 100%; }
+        }
+
+        /* --- CHAT UI (Clean Version) --- */
+        h1 { font-size: 1.2rem; text-align: center; margin: 15px 0; color: #333; }
+
+        #chat-box { 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            padding: 15px; 
+            display: flex; /* Hidden by default in logic, but flex when active */
+            flex-direction: column;
+            gap: 8px;
+            background-color: #fff;
+            display: none; /* Hidden initially */
+        }
+
+        .msg { 
+            padding: 10px 15px; 
+            border-radius: 18px; 
+            max-width: 80%; 
+            word-wrap: break-word;
+            font-size: 15px;
+            width: fit-content;
+        }
+        
+        .my-msg { background: #007AFF; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .stranger-msg { background: #f0f0f0; color: black; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .system-msg { align-self: center; color: #888; font-size: 0.8em; margin: 10px 0; }
+
+        /* CONTROLS */
+        #controls { 
+            padding: 15px;
+            background: #f9f9f9;
+            display: none; 
+            gap: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        input { 
+            flex-grow: 1; padding: 12px; border: 1px solid #ddd; 
+            border-radius: 20px; font-size: 16px; outline: none; 
+        }
+
+        button { cursor: pointer; border: none; font-weight: bold; }
+
+        #sendBtn { 
+            background-color: #007AFF; color: white; 
+            padding: 0 20px; border-radius: 20px; 
+        }
+
+        /* START SCREEN */
+        #start-screen {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        #startBtn {
+            padding: 15px 50px; font-size: 18px;
+            background: #4CAF50; color: white;
+            border-radius: 30px; margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+            transition: transform 0.1s;
+        }
+        #startBtn:active { transform: scale(0.95); }
+
+        #skipBtn {
+            padding: 10px 20px;
+            background: #ff3b30; color: white;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
     </style>
 </head>
 <body>
 
-    <h1>IIT Bhubaneswar Anonymous Chat</h1>
-    <p>Users Online: <span id="user-count">0</span></p>
-    <p id="status">Click "Find Stranger" to start</p>
-    <button id="findBtn">Find Stranger</button>
+    <div id="left-decor">
+        <div class="gradient-text">IIT<br>BBS</div>
+    </div>
 
-    <div id="chat-box"></div>
+    <div id="chat-container">
+        <h1>Anonymous Chat</h1>
+        
+        <div id="start-screen">
+            <p style="color: #666; font-size: 1.1em;">Find a random student.</p>
+            <button id="startBtn">Find Friend</button>
+            <p id="status-text" style="margin-top: 20px; color: #999; font-size: 14px;"></p>
+        </div>
 
-    <div id="controls">
-        <input type="text" id="msgInput" placeholder="Type a message...">
-        <button id="sendBtn">Send</button>
+        <div id="chat-box"></div>
+
+        <div id="controls">
+            <button id="skipBtn">Skip</button>
+            <input type="text" id="msgInput" placeholder="Message..." disabled>
+            <button id="sendBtn">Send</button>
+        </div>
+    </div>
+
+    <div id="right-decor">
+        <div id="big-label">USERS ONLINE</div>
+        <div id="big-count">0</div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        
         let currentRoom = null; 
 
-        const statusText = document.getElementById("status");
-        const findBtn = document.getElementById("findBtn");
+        // UI Elements
+        const startScreen = document.getElementById("start-screen");
+        const startBtn = document.getElementById("startBtn");
+        const statusText = document.getElementById("status-text");
         const chatBox = document.getElementById("chat-box");
         const controls = document.getElementById("controls");
         const msgInput = document.getElementById("msgInput");
         const sendBtn = document.getElementById("sendBtn");
-        // Listen for the count update
-        socket.on('user-count', (count) => {
-            document.getElementById("user-count").innerText = count;
+        const skipBtn = document.getElementById("skipBtn");
+        const bigCount = document.getElementById("big-count"); // The Big Number on Right
+
+        // --- 1. START ---
+        startBtn.addEventListener("click", startSearch);
+
+        // --- 2. SKIP ---
+        skipBtn.addEventListener("click", () => {
+            if(currentRoom) {
+                socket.emit('leave-chat');
+                addSystemMessage("You skipped.");
+            }
+            startSearch(); 
         });
 
-        // --- CORE LOGIC ---
-
-        // 1. Click "Find Stranger"
-        findBtn.addEventListener("click", () => {
-            socket.emit('join-chat'); 
-            findBtn.style.display = "none";
+        function startSearch() {
+            currentRoom = null;
+            chatBox.innerHTML = ""; 
+            msgInput.disabled = true;
+            sendBtn.disabled = true;
             
-            // Reset UI for new chat
-            statusText.innerText = "Searching for a stranger...";
-            statusText.style.color = "black";
-            chatBox.innerHTML = ""; // Clear old messages
-            msgInput.disabled = false;
-            sendBtn.disabled = false;
+            // Switch Screens
+            startScreen.style.display = "flex"; 
+            chatBox.style.display = "none";
+            controls.style.display = "none";
+            
+            startBtn.style.display = "none";    
+            statusText.innerText = "Searching...";
+            
+            socket.emit('join-chat');
+        }
+
+        // --- SOCKET EVENTS ---
+        socket.on('user-count', (count) => {
+            bigCount.innerText = count; // Update the HUGE number on the right
         });
 
-        // 2. Chat Started! (Server found a match)
         socket.on('start-chat', (roomID) => {
             currentRoom = roomID;
-            chatBox.style.display = "block";
-            controls.style.display = "flex";
-            statusText.innerText = "Stranger found! Say Hello.";
+            
+            startScreen.style.display = "none"; 
+            chatBox.style.display = "flex";
+            controls.style.display = "flex"; 
+            
+            addSystemMessage("Connected! Say Hi.");
+            msgInput.disabled = false;
+            sendBtn.disabled = false;
+            msgInput.focus();
         });
 
-        // 3. Receive Message
         socket.on('message', (msg) => {
             addMessage(msg, 'stranger-msg');
         });
 
-        // 4. Stranger Disconnected (The "Zombie" Fix)
         socket.on('stranger-disconnected', () => {
-            statusText.innerText = "Stranger disconnected.";
-            statusText.style.color = "red";
-            
-            // Lock the chat so you can't type
+            addSystemMessage("Stranger disconnected.");
             msgInput.disabled = true;
             sendBtn.disabled = true;
-
-            // Show button to find a NEW partner
-            findBtn.style.display = "block";
-            findBtn.innerText = "Find New Partner";
+            skipBtn.innerText = "New"; 
+            skipBtn.style.backgroundColor = "#4CAF50"; 
         });
 
-        // 5. Send Message Logic
+        // --- SEND LOGIC ---
         sendBtn.addEventListener("click", sendMessage);
-        
-        // Also send if user presses "Enter" key
         msgInput.addEventListener("keypress", (e) => {
             if (e.key === "Enter") sendMessage();
         });
 
         function sendMessage() {
-            const msg = msgInput.value;
+            const msg = msgInput.value.trim();
             if(!msg) return;
-
             addMessage(msg, 'my-msg');
             socket.emit('user-message', { message: msg, room: currentRoom });
             msgInput.value = "";
+            msgInput.focus();
         }
 
-        // UI Helper: Adds div to screen
         function addMessage(msg, type) {
             const div = document.createElement('div');
             div.innerText = msg;
@@ -115,14 +291,13 @@
             chatBox.scrollTop = chatBox.scrollHeight; 
         }
 
-        // Simple status update listener
-        socket.on('status', (msg) => {
-            // Only update status if we aren't already in a "disconnected" state
-            if (statusText.innerText !== "Stranger disconnected.") {
-                statusText.innerText = msg;
-            }
-        });
-
+        function addSystemMessage(msg) {
+            const div = document.createElement('div');
+            div.innerText = msg;
+            div.classList.add('msg', 'system-msg');
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight; 
+        }
     </script>
 </body>
 </html>

@@ -235,8 +235,15 @@
         });
 
         function sendMessage() {
+            // Fix: Don't send if we are offline
+            if (!socket.connected) {
+                addSystemMessage("Connection lost. Please wait...");
+                return;
+            }
+
             const msg = msgInput.value.trim();
             if(!msg) return;
+            
             addMessage(msg, 'my-msg');
             socket.emit('user-message', { message: msg, room: currentRoom });
             msgInput.value = "";

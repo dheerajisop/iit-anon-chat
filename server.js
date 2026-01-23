@@ -47,17 +47,20 @@ io.on('connection', (socket) => {
     socket.on('user-message', (data) => {
         const { message, room } = data;
         
-        // --- THE FIX: CHECK IF ROOM EXISTS ---
-        // If the room is gone (server cleaned it up) or empty, tell the sender to stop.
-        const roomExists = io.sockets.adapter.rooms.get(room);
+        // 1. Get the list of people actually inside this room
+        const clientsInRoom = io.sockets.adapter.rooms.get(room);
         
-        if (!roomExists || roomExists.size === 0) {
-            // Tell the SENDER that the chat is dead
+        // 2. STRICT CHECK:
+        // A) Does the room exist?
+        // B) Is the SENDER (socket.id) actually inside this room?
+        if (!clientsInRoom || !clientsInRoom.has(socket.id)) {
+            // If not, they are a "Ghost" (reconnected user with new ID).
+            // Tell them the chat is over.
             socket.emit('stranger-disconnected'); 
             return;
         }
 
-        // Forward the message to the other person
+        // 3. If they passed the check, send the message
         socket.to(room).emit('message', message);
     });
     // ... inside io.on('connection', socket) ...

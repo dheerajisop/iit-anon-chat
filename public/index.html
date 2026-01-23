@@ -17,7 +17,6 @@
             padding: 0;
             display: flex;
             justify-content: center;
-            /* MOBILE HEIGHT FIX: Use dvh (dynamic height) */
             height: 100dvh; 
             overflow: hidden; 
         }
@@ -33,7 +32,6 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
-        /* HEADER */
         header {
             padding: 15px;
             text-align: center;
@@ -47,7 +45,6 @@
         h1 { margin: 0; font-size: 1.1rem; color: #333; }
         #user-count { font-size: 0.8rem; color: #4CAF50; font-weight: bold; }
 
-        /* CHAT AREA */
         #chat-box { 
             flex-grow: 1; 
             overflow-y: auto; 
@@ -64,7 +61,6 @@
         .stranger-msg { background: #e4e6eb; color: black; align-self: flex-start; border-bottom-left-radius: 4px; }
         .system-msg { align-self: center; color: #888; font-size: 0.8em; margin: 5px 0; text-align: center; }
 
-        /* CONTROLS */
         #controls { 
             padding: 10px;
             background: #fff;
@@ -87,21 +83,21 @@
         
         #sendBtn { background-color: #007AFF; padding: 12px 20px; border-radius: 25px; }
         
-        /* The Red Skip Button / Rematch Icon */
+        /* --- CHANGED: Default style is now the Blue Rematch Icon --- */
         #skipBtn { 
-            background-color: #ff3b30; 
-            padding: 12px; 
-            border-radius: 50%; 
-            width: 45px; height: 45px;
+            background-color: transparent; 
+            color: #007AFF; /* Blue color */
+            padding: 0; 
+            width: auto; 
+            height: 45px;
             display: flex; justify-content: center; align-items: center;
-            font-size: 14px;
+            font-size: 28px; /* Big Icon */
         }
 
-        /* START SCREEN OVERLAY */
         #start-screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.95); /* Slightly transparent */
+            background: rgba(255,255,255,0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -120,9 +116,8 @@
 <body>
 
     <div id="app-container">
-        
         <header>
-            <h1>Incext Anon Chat</h1>
+            <h1>Incext anon Chat</h1>
             <span id="user-count">0 Online</span>
         </header>
 
@@ -136,11 +131,10 @@
         <div id="chat-box"></div>
 
         <div id="controls" style="display: none;">
-            <button id="skipBtn" title="Skip">❌</button>
+            <button id="skipBtn" title="Next Partner">🔄</button>
             <input type="text" id="msgInput" placeholder="Type a message...">
             <button id="sendBtn">Send</button>
         </div>
-
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -148,7 +142,6 @@
         const socket = io();
         let currentRoom = null; 
 
-        // Elements
         const startScreen = document.getElementById("start-screen");
         const findBtn = document.getElementById("findBtn");
         const statusText = document.getElementById("status");
@@ -160,22 +153,19 @@
         const skipBtn = document.getElementById("skipBtn");
         const userCount = document.getElementById("user-count");
 
-        // --- SCROLL LOGIC ---
         function scrollToBottom() {
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // --- 1. FIND FRIEND ---
         findBtn.addEventListener("click", () => {
             startSearch();
         });
 
-        // --- 2. SKIP / REMATCH ---
         skipBtn.addEventListener("click", () => {
             if(currentRoom) {
                 socket.emit('leave-chat');
             }
-            startSearch(); // Go straight to search
+            startSearch(); 
         });
 
         function startSearch() {
@@ -183,20 +173,12 @@
             chatBox.innerHTML = ""; 
             msgInput.value = "";
             
-            // --- LOGIC FIX 1: Bring back the Start Screen ---
-            // Even if we are skipping, we need to show the "Searching..." overlay
             startScreen.style.display = "flex"; 
-            controls.style.display = "none"; // Hide inputs while searching
+            controls.style.display = "none"; 
 
-            // --- LOGIC FIX 2: Reset the Button ---
-            // Reset "Big Rematch" icon back to "Small Red Skip" button
-            skipBtn.innerHTML = "❌"; 
-            skipBtn.style.backgroundColor = "#ff3b30"; 
-            skipBtn.style.fontSize = "14px"; 
-            skipBtn.style.boxShadow = "";
-            skipBtn.style.width = "45px"; // Reset size
+            // --- NO MORE TURNING RED ---
+            // The button stays as the blue '🔄' icon defined in CSS.
 
-            // Update Text
             findBtn.disabled = true;
             findBtn.innerText = "Searching...";
             findBtn.style.backgroundColor = "#ccc";
@@ -205,7 +187,6 @@
             socket.emit('join-chat');
         }
 
-        // --- SOCKET EVENTS ---
         socket.on('user-count', (count) => {
             userCount.innerText = count + " Online";
         });
@@ -213,7 +194,6 @@
         socket.on('start-chat', (roomID) => {
             currentRoom = roomID;
             
-            // Hide Searching Screen, Show Chat
             startScreen.style.display = "none";
             controls.style.display = "flex";
             
@@ -234,16 +214,10 @@
             msgInput.disabled = true;
             sendBtn.disabled = true;
             
-            // --- LOGIC FIX 3: Turn Button into "Big Rematch" ---
-            skipBtn.innerHTML = "🔄"; // Big Arrow
-            skipBtn.style.backgroundColor = "transparent"; // See-through
-            skipBtn.style.fontSize = "28px"; // Big Icon
-            skipBtn.style.color = "#007AFF"; // Blue Color
-            skipBtn.style.width = "auto"; // Allow it to expand
-            skipBtn.style.boxShadow = "none"; 
+            // It is already the refresh icon, so we don't need to change styling here.
+            // Just keeping it simple.
         });
 
-        // --- MESSAGING ---
         sendBtn.addEventListener("click", sendMessage);
         msgInput.addEventListener("keypress", (e) => {
             if (e.key === "Enter") sendMessage();

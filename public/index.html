@@ -17,15 +17,14 @@
             padding: 0;
             display: flex;
             justify-content: center;
-            /* TRICK 2: Use Dynamic Height (dvh) to respect the keyboard area */
+            /* MOBILE HEIGHT FIX: Use dvh (dynamic height) */
             height: 100dvh; 
-            overflow: hidden; /* Stop the whole page from scrolling */
+            overflow: hidden; 
         }
 
-        /* The Main Container acts like a "Screen within a Screen" */
         #app-container {
             width: 100%;
-            max-width: 500px; /* Limits width on laptops */
+            max-width: 500px;
             height: 100%;
             background: white;
             display: flex;
@@ -34,21 +33,24 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
-        /* --- HEADER --- */
+        /* HEADER */
         header {
             padding: 15px;
             text-align: center;
             border-bottom: 1px solid #ddd;
             background: #fff;
             z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        h1 { margin: 0; font-size: 1.2rem; color: #333; }
+        h1 { margin: 0; font-size: 1.1rem; color: #333; }
         #user-count { font-size: 0.8rem; color: #4CAF50; font-weight: bold; }
 
-        /* --- CHAT AREA --- */
+        /* CHAT AREA */
         #chat-box { 
-            flex-grow: 1; /* Fills all available space */
-            overflow-y: auto; /* Allows scrolling inside this box only */
+            flex-grow: 1; 
+            overflow-y: auto; 
             padding: 15px;
             display: flex;
             flex-direction: column;
@@ -57,69 +59,60 @@
             scroll-behavior: smooth;
         }
 
-        /* Bubbles */
         .msg { padding: 10px 14px; border-radius: 18px; max-width: 80%; word-wrap: break-word; width: fit-content; font-size: 15px; }
         .my-msg { background: #007AFF; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
         .stranger-msg { background: #e4e6eb; color: black; align-self: flex-start; border-bottom-left-radius: 4px; }
         .system-msg { align-self: center; color: #888; font-size: 0.8em; margin: 5px 0; text-align: center; }
 
-        /* --- BOTTOM CONTROLS --- */
+        /* CONTROLS */
         #controls { 
             padding: 10px;
             background: #fff;
             border-top: 1px solid #eee;
-            display: flex; /* Flex makes buttons sit nicely next to input */
+            display: flex; 
             gap: 10px;
             align-items: center;
         }
 
-        /* The input bar */
         input { 
-            flex-grow: 1; /* Takes all remaining width */
+            flex-grow: 1; 
             padding: 12px; 
             border: 1px solid #ccc; 
             border-radius: 25px; 
             outline: none;
-            font-size: 16px; /* Prevents iPhone Zoom */
+            font-size: 16px; 
         }
 
-        /* Buttons */
         button { border: none; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
         
-        #sendBtn { 
-            background-color: #007AFF; 
-            padding: 12px 20px; 
-            border-radius: 25px; 
-        }
+        #sendBtn { background-color: #007AFF; padding: 12px 20px; border-radius: 25px; }
         
+        /* The Red Skip Button / Rematch Icon */
         #skipBtn { 
             background-color: #ff3b30; 
             padding: 12px; 
-            border-radius: 50%; /* Circle button */
-            width: 45px;
-            height: 45px;
+            border-radius: 50%; 
+            width: 45px; height: 45px;
             display: flex; justify-content: center; align-items: center;
-            font-size: 12px;
+            font-size: 14px;
         }
 
-        /* --- START SCREEN OVERLAY --- */
+        /* START SCREEN OVERLAY */
         #start-screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: white;
+            background: rgba(255,255,255,0.95); /* Slightly transparent */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 20;
+            backdrop-filter: blur(5px);
         }
         #findBtn {
-            padding: 15px 40px;
-            font-size: 18px;
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 30px;
-            margin-top: 20px;
+            padding: 15px 40px; font-size: 18px;
+            background-color: #4CAF50; color: white;
+            border-radius: 30px; margin-top: 20px;
         }
 
     </style>
@@ -129,13 +122,13 @@
     <div id="app-container">
         
         <header>
-            <h1>Insext Anon Chat</h1>
+            <h1>Incext Anon Chat</h1>
             <span id="user-count">0 Online</span>
         </header>
 
         <div id="start-screen">
             <h2 style="color: #444;">Bored?</h2>
-            <p style="color: #777;">Chat with a random cuck/bull.</p>
+            <p style="color: #777;">Chat with a random student.</p>
             <button id="findBtn">Find Friend</button>
             <p id="status" style="margin-top: 20px; color: #999; font-size: 14px;">Ready to search...</p>
         </div>
@@ -177,13 +170,12 @@
             startSearch();
         });
 
-        // --- 2. SKIP ---
+        // --- 2. SKIP / REMATCH ---
         skipBtn.addEventListener("click", () => {
             if(currentRoom) {
                 socket.emit('leave-chat');
-                addSystemMessage("You skipped.");
             }
-            startSearch();
+            startSearch(); // Go straight to search
         });
 
         function startSearch() {
@@ -191,15 +183,20 @@
             chatBox.innerHTML = ""; 
             msgInput.value = "";
             
-            // --- RESET BUTTON STYLE ---
-            // Turn the big refresh icon back into a small Red Skip button
+            // --- LOGIC FIX 1: Bring back the Start Screen ---
+            // Even if we are skipping, we need to show the "Searching..." overlay
+            startScreen.style.display = "flex"; 
+            controls.style.display = "none"; // Hide inputs while searching
+
+            // --- LOGIC FIX 2: Reset the Button ---
+            // Reset "Big Rematch" icon back to "Small Red Skip" button
             skipBtn.innerHTML = "❌"; 
             skipBtn.style.backgroundColor = "#ff3b30"; 
-            skipBtn.style.fontSize = "12px"; 
-            skipBtn.style.padding = "12px";
-            skipBtn.style.boxShadow = ""; 
+            skipBtn.style.fontSize = "14px"; 
+            skipBtn.style.boxShadow = "";
+            skipBtn.style.width = "45px"; // Reset size
 
-            // Show Loading UI
+            // Update Text
             findBtn.disabled = true;
             findBtn.innerText = "Searching...";
             findBtn.style.backgroundColor = "#ccc";
@@ -216,7 +213,7 @@
         socket.on('start-chat', (roomID) => {
             currentRoom = roomID;
             
-            // Switch UI
+            // Hide Searching Screen, Show Chat
             startScreen.style.display = "none";
             controls.style.display = "flex";
             
@@ -234,20 +231,16 @@
         socket.on('stranger-disconnected', () => {
             addSystemMessage("Friend disconnected.");
             
-            // Lock the input
             msgInput.disabled = true;
             sendBtn.disabled = true;
             
-            // --- THE FIX ---
-            // Transform the Skip button into a Big Rematch Icon
-            skipBtn.innerHTML = "🔄"; 
-            skipBtn.style.backgroundColor = "transparent"; // No Background
-            skipBtn.style.fontSize = "30px"; // BIG Logo
-            skipBtn.style.boxShadow = "none"; // Remove any shadow
-            skipBtn.style.padding = "0"; 
-            
-            // Optional: Make the icon spin or bounce slightly on hover if you wanted, 
-            // but this is enough to make it big and clean.
+            // --- LOGIC FIX 3: Turn Button into "Big Rematch" ---
+            skipBtn.innerHTML = "🔄"; // Big Arrow
+            skipBtn.style.backgroundColor = "transparent"; // See-through
+            skipBtn.style.fontSize = "28px"; // Big Icon
+            skipBtn.style.color = "#007AFF"; // Blue Color
+            skipBtn.style.width = "auto"; // Allow it to expand
+            skipBtn.style.boxShadow = "none"; 
         });
 
         // --- MESSAGING ---

@@ -191,6 +191,14 @@
             chatBox.innerHTML = ""; 
             msgInput.value = "";
             
+            // --- RESET BUTTON STYLE ---
+            // Turn the big refresh icon back into a small Red Skip button
+            skipBtn.innerHTML = "❌"; 
+            skipBtn.style.backgroundColor = "#ff3b30"; 
+            skipBtn.style.fontSize = "12px"; 
+            skipBtn.style.padding = "12px";
+            skipBtn.style.boxShadow = ""; 
+
             // Show Loading UI
             findBtn.disabled = true;
             findBtn.innerText = "Searching...";
@@ -226,14 +234,20 @@
         socket.on('stranger-disconnected', () => {
             addSystemMessage("Friend disconnected.");
             
-            // Reset UI slightly
+            // Lock the input
             msgInput.disabled = true;
             sendBtn.disabled = true;
             
-            // Bring back start screen after 2 seconds? Or just offer "New" button?
-            // Let's modify the SKIP button to be a "NEW" button
-            skipBtn.innerHTML = "🔄"; // Refresh icon
-            skipBtn.style.backgroundColor = "#4CAF50"; // Green
+            // --- THE FIX ---
+            // Transform the Skip button into a Big Rematch Icon
+            skipBtn.innerHTML = "🔄"; 
+            skipBtn.style.backgroundColor = "transparent"; // No Background
+            skipBtn.style.fontSize = "30px"; // BIG Logo
+            skipBtn.style.boxShadow = "none"; // Remove any shadow
+            skipBtn.style.padding = "0"; 
+            
+            // Optional: Make the icon spin or bounce slightly on hover if you wanted, 
+            // but this is enough to make it big and clean.
         });
 
         // --- MESSAGING ---

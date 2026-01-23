@@ -205,17 +205,28 @@
         });
 
         socket.on('message', (msg) => {
+            // 2. THE GUARD: If we are not in a room, ignore the message!
+            if (currentRoom === null) return; 
+
             addMessage(msg, 'stranger-msg');
         });
 
         socket.on('stranger-disconnected', () => {
             addSystemMessage("Friend disconnected.");
             
+            // 1. IMPORTANT: Nullify the room immediately
+            currentRoom = null; 
+
             msgInput.disabled = true;
             sendBtn.disabled = true;
             
-            // It is already the refresh icon, so we don't need to change styling here.
-            // Just keeping it simple.
+            // Turn Button into "Big Rematch"
+            skipBtn.innerHTML = "🔄"; 
+            skipBtn.style.backgroundColor = "transparent"; 
+            skipBtn.style.fontSize = "28px"; 
+            skipBtn.style.color = "#007AFF"; 
+            skipBtn.style.width = "auto"; 
+            skipBtn.style.boxShadow = "none"; 
         });
 
         sendBtn.addEventListener("click", sendMessage);

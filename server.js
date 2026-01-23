@@ -5,7 +5,10 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    pingTimeout: 60000, // Wait 60 seconds (default is 20s)
+    pingInterval: 25000 // Send a "Are you there?" check every 25s
+});
 
 app.use(express.static(path.resolve("./public")));
 

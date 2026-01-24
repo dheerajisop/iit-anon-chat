@@ -5,9 +5,12 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
+// server.js
 const io = new Server(server, {
-    pingTimeout: 60000, // Wait 60 seconds (default is 20s)
-    pingInterval: 25000 // Send a "Are you there?" check every 25s
+    pingTimeout: 60000, // Wait 60s
+    pingInterval: 25000, 
+    transports: ['websocket'], // <--- ADD THIS (Force WebSockets)
+    allowUpgrades: false       // Disable the "upgrade from HTTP" logic
 });
 
 app.use(express.static(path.resolve("./public")));

@@ -12,37 +12,24 @@
 
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f0f2f5;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             height: 100dvh; 
             overflow: hidden; 
-            
-            /* --- BACKGROUND IMAGE CODE --- */
-            background-image: url('/bg.jpg'); 
-            background-size: cover;       /* Stretch to fill screen */
-            background-position: center;  /* Center the building/subject */
-            background-repeat: no-repeat;
-            background-attachment: fixed; /* Cool effect: Image stays still when scrolling */
-            
-            /* Optional: Add a dark tint so the white chat box pops out */
-            background-color: #333; 
         }
 
         #app-container {
             width: 100%;
             max-width: 500px;
             height: 100%;
-            
-            /* GLASS EFFECT */
-            background: rgba(255, 255, 255, 0.92); /* 92% opaque white */
-            backdrop-filter: blur(5px); /* Blurs the photo behind the chat */
-            
+            background: white;
             display: flex;
             flex-direction: column;
             position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
         header {

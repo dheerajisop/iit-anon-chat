@@ -34,11 +34,15 @@
             width: 100%;
             max-width: 500px;
             height: 100%;
-            background: white;
+            
+            /* GLASS EFFECT */
+            background: rgba(255, 255, 255, 0.92); /* 92% opaque white */
+            backdrop-filter: blur(5px); /* Blurs the photo behind the chat */
+            
             display: flex;
             flex-direction: column;
             position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
         header {

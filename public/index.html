@@ -63,27 +63,34 @@
         }
 
         /* --- THE WATERMARK TEXT --- */
+        /* --- IMPROVED WATERMARK --- */
         #chat-box::before {
-            content: 'BE\A RES\A PECT\A FUL'; /* \A is a line break */
+            /* content: 'BE\A RES\A PECT\A FUL';  <-- OLD (Too tall) */
+            content: 'BE RESPECTFUL'; /* Keep it simple on one/two lines */
+            
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            
-            /* Put it BEHIND the messages */
-            z-index: -1; 
+            z-index: -1;
             
             font-family: sans-serif;
-            font-weight: 900; 
-            font-size: 5rem; 
-            line-height: 1;
+            font-weight: 900;
+            
+            /* RESPONSIVE SIZE: 
+               12vw means "12% of screen width". 
+               It will be small on phones, big on laptops. */
+            font-size: 12vw; 
+            
+            line-height: 1.2;
             text-align: center;
             
-            /* Light Blue Transparent Color */
-            color: rgba(135, 206, 250, 0.2); 
+            /* Much lighter color so it doesn't clash with text */
+            color: rgba(135, 206, 250, 0.12); 
             
-            pointer-events: none; /* Let clicks pass through */
-            white-space: pre;
+            pointer-events: none;
+            white-space: pre-wrap; /* Allow wrapping naturally if needed */
+            width: 100%; /* Ensure it centers properly */
         }
 
         .msg { padding: 10px 14px; border-radius: 18px; max-width: 80%; word-wrap: break-word; width: fit-content; font-size: 15px; }

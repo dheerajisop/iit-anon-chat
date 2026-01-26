@@ -45,15 +45,55 @@
         h1 { margin: 0; font-size: 1.1rem; color: #333; }
         #user-count { font-size: 0.8rem; color: #4CAF50; font-weight: bold; }
 
-        #chat-box { 
-            flex-grow: 1; 
-            overflow-y: auto; 
+        /* --- CHAT AREA --- */
+        #chat-box {
+            /* IMPORTANT: Add this line so the background text stays inside */
+            position: relative; 
+            
+            flex-grow: 1;
+            overflow-y: auto;
             padding: 15px;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            background-color: #f9f9f9;
             scroll-behavior: smooth;
+            
+            /* Ensure the chat box background itself is transparent so the effect shows */
+            background-color: transparent; 
+        }
+
+        /* --- NEW: The "BE RESPECTFUL" Background Text --- */
+        #chat-box::before {
+            /* The text content, with \A for new lines to stack them */
+            content: 'BE\A RES\A PECT\A FUL';
+            
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            /* Center the text block perfectly */
+            transform: translate(-50%, -50%);
+            
+            /* Place it behind the chat messages */
+            z-index: -1;
+            
+            /* --- Styling --- */
+            font-family: sans-serif;
+            font-weight: 900; /* Extra Bold */
+            font-size: 5rem;  /* Large text */
+            line-height: 1;
+            text-align: center;
+            
+            /* Light blue, transparent color (rgba). Adjust the last number (0.15) for opacity */
+            color: rgba(135, 206, 250, 0.15);
+            
+            /* Prevents the text from being selectable or interfering with clicks */
+            pointer-events: none;
+            
+            /* Preserves the line breaks from the 'content' */
+            white-space: pre;
+            
+            /* Optional: A slight blur for a more "background" feel */
+            filter: blur(1px);
         }
 
         .msg { padding: 10px 14px; border-radius: 18px; max-width: 80%; word-wrap: break-word; width: fit-content; font-size: 15px; }

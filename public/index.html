@@ -45,52 +45,15 @@
         h1 { margin: 0; font-size: 1.1rem; color: #333; }
         #user-count { font-size: 0.8rem; color: #4CAF50; font-weight: bold; }
 
-        /* --- CHAT AREA --- */
-        /* --- CHAT AREA --- */
-        #chat-box {
-            position: relative; /* Essential for the watermark to stay inside */
-            flex-grow: 1;
-            overflow-y: auto;
+        #chat-box { 
+            flex-grow: 1; 
+            overflow-y: auto; 
             padding: 15px;
             display: flex;
             flex-direction: column;
             gap: 10px;
+            background-color: #f9f9f9;
             scroll-behavior: smooth;
-            
-            /* --- CRITICAL FIX: Make this transparent! --- */
-            background-color: transparent; 
-            z-index: 1; /* Establishes a stacking context */
-        }
-
-        /* --- THE WATERMARK TEXT --- */
-        /* --- IMPROVED WATERMARK --- */
-        #chat-box::before {
-            /* content: 'BE\A RES\A PECT\A FUL';  <-- OLD (Too tall) */
-            content: 'BE RESPECTFUL'; /* Keep it simple on one/two lines */
-            
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: -1;
-            
-            font-family: sans-serif;
-            font-weight: 900;
-            
-            /* RESPONSIVE SIZE: 
-               12vw means "12% of screen width". 
-               It will be small on phones, big on laptops. */
-            font-size: 12vw; 
-            
-            line-height: 1.2;
-            text-align: center;
-            
-            /* Much lighter color so it doesn't clash with text */
-            color: rgba(135, 206, 250, 0.12); 
-            
-            pointer-events: none;
-            white-space: pre-wrap; /* Allow wrapping naturally if needed */
-            width: 100%; /* Ensure it centers properly */
         }
 
         .msg { padding: 10px 14px; border-radius: 18px; max-width: 80%; word-wrap: break-word; width: fit-content; font-size: 15px; }
@@ -237,7 +200,7 @@
             startScreen.style.display = "none";
             controls.style.display = "flex";
             
-            addSystemMessage("Connected to Anonymous Friend.");
+            addSystemMessage("Connected to Anonymous Friend.BE RESPECTFUL");
             
             msgInput.disabled = false;
             sendBtn.disabled = false;

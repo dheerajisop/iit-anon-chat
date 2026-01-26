@@ -46,10 +46,9 @@
         #user-count { font-size: 0.8rem; color: #4CAF50; font-weight: bold; }
 
         /* --- CHAT AREA --- */
+        /* --- CHAT AREA --- */
         #chat-box {
-            /* IMPORTANT: Add this line so the background text stays inside */
-            position: relative; 
-            
+            position: relative; /* Essential for the watermark to stay inside */
             flex-grow: 1;
             overflow-y: auto;
             padding: 15px;
@@ -58,42 +57,33 @@
             gap: 10px;
             scroll-behavior: smooth;
             
-            /* Ensure the chat box background itself is transparent so the effect shows */
+            /* --- CRITICAL FIX: Make this transparent! --- */
             background-color: transparent; 
+            z-index: 1; /* Establishes a stacking context */
         }
 
-        /* --- NEW: The "BE RESPECTFUL" Background Text --- */
+        /* --- THE WATERMARK TEXT --- */
         #chat-box::before {
-            /* The text content, with \A for new lines to stack them */
-            content: 'BE\A RES\A PECT\A FUL';
-            
+            content: 'BE\A RES\A PECT\A FUL'; /* \A is a line break */
             position: absolute;
             top: 50%;
             left: 50%;
-            /* Center the text block perfectly */
             transform: translate(-50%, -50%);
             
-            /* Place it behind the chat messages */
-            z-index: -1;
+            /* Put it BEHIND the messages */
+            z-index: -1; 
             
-            /* --- Styling --- */
             font-family: sans-serif;
-            font-weight: 900; /* Extra Bold */
-            font-size: 5rem;  /* Large text */
+            font-weight: 900; 
+            font-size: 5rem; 
             line-height: 1;
             text-align: center;
             
-            /* Light blue, transparent color (rgba). Adjust the last number (0.15) for opacity */
-            color: rgba(135, 206, 250, 0.15);
+            /* Light Blue Transparent Color */
+            color: rgba(135, 206, 250, 0.2); 
             
-            /* Prevents the text from being selectable or interfering with clicks */
-            pointer-events: none;
-            
-            /* Preserves the line breaks from the 'content' */
+            pointer-events: none; /* Let clicks pass through */
             white-space: pre;
-            
-            /* Optional: A slight blur for a more "background" feel */
-            filter: blur(1px);
         }
 
         .msg { padding: 10px 14px; border-radius: 18px; max-width: 80%; word-wrap: break-word; width: fit-content; font-size: 15px; }
@@ -240,7 +230,7 @@
             startScreen.style.display = "none";
             controls.style.display = "flex";
             
-            addSystemMessage("Connected to Anonymous Friend.BE RESPECTFUL");
+            addSystemMessage("Connected to Anonymous Friend.");
             
             msgInput.disabled = false;
             sendBtn.disabled = false;
